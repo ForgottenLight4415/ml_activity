@@ -1,6 +1,6 @@
 from flask import Flask
 
-from .views import main
+from .main import main
 
 def create_app():
     app = Flask(__name__)

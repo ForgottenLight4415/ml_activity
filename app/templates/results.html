@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+{% block head %}
+    <title>Training Results</title>
+{% endblock %}
+{% block body %}
+    <center>
+        <h1 class="py-3">Training Results</h1>
+    </center>
+
+    <div class="row">
+        <div class="col">
+            {% if render_args is not none %}
+                {% include "train_results.html" %}
+            {% endif %}
+        </div>
+        <div class="col">
+            {% if render_args is not none %}
+                {% include "experiment.html" %}
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

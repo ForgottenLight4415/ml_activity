@@ -5,8 +5,7 @@
         </h2>
     </center>
 
-    <form method='POST' enctype='multipart/form-data' id="evaluation-form">
-        <input type="hidden" name="form-type" value="experiment">
+    <form id="evaluation-form" method='POST' action="/evaluate">
         <table class="table">
             <thead>
                 <tr>
@@ -53,11 +52,11 @@
 
         {% if render_args['result'] is not none %}
             <div class="results">
-                <h4>Result: {{ '%0.3f'| format(render_args['result'][0][0]|float) }}</h4>
+                <h4>Result: {{ '%0.3f'| format(render_args['result'][0]|float) }}</h4>
             </div>
         {% endif %}
         
-        <button id="submit-experiment" class="btn btn-primary">Submit</button>
+        <button type="submit" class="btn btn-primary">Submit</button>
     </form>
 
 </div>

@@ -15,6 +15,7 @@ def linear_regression(dataFile, target):
     X_train, X_test, y_train, y_test = split_data
     model = linear_model.LinearRegression()
     model.fit(X_train, y_train)
+    pred = model.predict(X_test)
     score = model.score(X_test, y_test)
     model_info = dict({
         "Algorithm" : "Linear Regression",
@@ -27,4 +28,4 @@ def linear_regression(dataFile, target):
         "Target" : target,
         "Model accuracy" : "{accuracy:.4f} %".format(accuracy=score * 100)
     })
-    return model, model_info
+    return model, model_info, X_train, X_test, y_train, y_test, pred

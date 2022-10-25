@@ -1,0 +1,30 @@
+<div class="container">
+    <center>
+        <h2>
+            Start training
+        </h2>
+    </center>
+
+    <form method='POST' enctype='multipart/form-data'>
+        <input type="hidden" name="form-type" value="training">
+        <div class="mb-3">
+            <label for="formFile" class="form-label">Upload training file (CSV format only)</label>
+            <input class="form-control" type="file" id="training_file" name="training_file" required="true">
+        </div>
+
+        <div class="mb-3">
+            <label for="learning_method_selector" class="form-label">Select learning method</label>
+            <select class="form-select" aria-label="Default select example" id="learning_method" name="learning_method" required="true">
+                <option selected value="supervised">Supervised</option>
+                <option value="unsupervised">Unsupervised</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="learning_method_selector" class="form-label">Select algorithm</label>
+            <select class="form-select" aria-label="Default select example" id="algorithm" name="algorithm"></select>
+        </div>
+        
+        <button type="submit" class="btn btn-primary">Start training</button>
+    </form>
+</div>

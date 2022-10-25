@@ -1,0 +1,63 @@
+<div class="container mt-4">
+    <center>
+        <h2>
+            Experiment Yourself
+        </h2>
+    </center>
+
+    <form method='POST' enctype='multipart/form-data' id="evaluation-form">
+        <input type="hidden" name="form-type" value="experiment">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Parameter</th>
+                    <th scope="col">Value</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for name in render_args['info']["Column names"][:-1] %}
+                <tr>
+                    <th scope="row">{{ name }}</th>
+                    <td>
+                        <div class="mb-3">
+                            <input type="text" class="form-control" name="{{ name }}">
+                        </div>
+                    </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        {% if render_args['experiment_vals'] is not none %}
+            <div class="experiment-vals">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Parameter</th>
+                            <th scope="col">Information</th>
+                        </tr>
+                    </thead>
+            
+                    <tbody>
+                        {% for i in range(render_args['experiment_vals'][0]|length) %}
+                            <tr>
+                                <th scope="row">{{ render_args['info']["Column names"][i] }}</th>
+                                <td>{{ render_args['experiment_vals'][0][i] }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+
+        {% if render_args['result'] is not none %}
+            <div class="results">
+                <h4>Result: {{ '%0.3f'| format(render_args['result'][0][0]|float) }}</h4>
+            </div>
+        {% endif %}
+        
+        <button id="submit-experiment" class="btn btn-primary">Submit</button>
+    </form>
+
+</div>

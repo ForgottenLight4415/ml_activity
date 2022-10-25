@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+{% block head %}
+    <title>Experiment with ML</title>
+{% endblock %}
+{% block body %}
+    <center>
+        <h1 class="py-3">Experiment with ML</h1>
+    </center>
+
+    <div class="row">
+        <div class="col">
+            {% include "train_form_layout.html" %}
+            {% if render_args is not none %}
+                {% include "experiment.html" %}
+            {% endif %}
+        </div>
+        <div class="col">
+            {% if render_args is not none %}
+                {% include "train_results.html" %}
+            {% endif %}
+        </div>
+    </div>
+    
+    <script src="{{ url_for('static', filename='js/training_form.js') }}"></script>
+{% endblock %}

@@ -1,9 +1,7 @@
 <div class="container">
-    <center>
-        <h2>
-            Start training
-        </h2>
-    </center>
+    <div style="text-align: center;">
+        <h2>Start training</h2>
+    </div>
 
     <form id='training_form_a'>
         <div class="mb-3">
@@ -27,14 +25,21 @@
         <button type="submit" class="btn btn-primary">Submit</button>
     </form>
 
-    <div id="supervised_target_selection" class="mt-3" style="display: none;">
-        <form id='training_form_b'>
+    <div id="target_selection" class="mt-3" style="display: none;">
+        <form id='training_form_b' enctype="application/x-www-form-urlencoded" method="POST" action="/submit/training/2">
             <div class="mb-3">
-                <label for="target_col_selector" class="form-label">Select target column</label>
+                <label for="target_col_field" class="form-label">Select target column</label>
                 <select class="form-select" id="target_col_field" name="target"></select>
             </div>
+
+            <div class="mb-3">
+                <label for="drop_cols_checkboxes" class="form-label">Select columns to drop</label>
+                <div id="drop-checkboxes"></div>
+            </div>
+
+            <div class="mb-3" id="additional-options" style="display: none"></div>
             
-            <button type="submit" class="btn btn-primary">Start training</button>
+            <button type="submit" class="btn btn-primary my-3">Start training</button>
         </form>
     </div>
 </div>

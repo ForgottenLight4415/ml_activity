@@ -3,21 +3,27 @@
     <title>Training Results</title>
 {% endblock %}
 {% block body %}
-    <center>
+    <div style="text-align: center;">
         <h1 class="py-3">Training Results</h1>
-    </center>
+    </div>
 
     <div class="row">
         <div class="col">
             {% if render_args is not none %}
                 {% include "train_results.html" %}
-                <img src="/image" alt="train_info">
             {% endif %}
         </div>
         <div class="col">
-            {% if render_args is not none %}
+            <img src="/image" alt="train_info">
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            {% if render_args is not none and experiment is true %}
                 {% include "experiment.html" %}
             {% endif %}
         </div>
     </div>
+
+    <script src="{{ url_for('static', filename='js/evaluation_form.js') }}"></script>
 {% endblock %}

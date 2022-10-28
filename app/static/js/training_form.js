@@ -1,11 +1,22 @@
-var filePath = "";
-
 function targetSelector(field, columns) {
     let optionHTML = '';
     for (let col of columns) {
         optionHTML += '<option value ="'  + col + '">' + col + '</option>';
     }
     field.innerHTML = optionHTML;
+}
+
+function dropColumnCheckBoxGenerator(div, columns) {
+    let checkBoxHTML = '';
+    for (let col of columns) {
+        checkBoxHTML += "<div class=\"form-check\">\n" +
+            "  <input class=\"form-check-input\" type=\"checkbox\" name='check_" + col + "' value=\"" + col + "\"" +
+            "  <label class=\"form-check-label\" for=\"check_" + col + "\">\n" +
+            "    " + col + "\n" +
+            "  </label>\n" +
+            "</div>";
+    }
+    div.innerHTML = checkBoxHTML;
 }
 
 async function sumbitTrainingFormA(e, training_form) {
@@ -16,55 +27,54 @@ async function sumbitTrainingFormA(e, training_form) {
         body: formData
     });
 
-    const supervised_target_selection = document.getElementById("supervised_target_selection");
-    if (formData.get("learning_method") === "supervised") {
-        supervised_target_selection.style.display = "block";
-    } else {
-        supervised_target_selection.style.display = "none";
-    }
+    const supervised_target_selection = document.getElementById("target_selection");
+    supervised_target_selection.style.display = "block";
 
     const result = await response.json();
     const targetField = document.getElementById("target_col_field");
     targetSelector(targetField, result["columns"]);
-    filePath = result["file_path"];
-    console.log(filePath);
-}
 
-async function sumbitTrainingFormB(e, trainingFormA, trainingFormB) {
-    e.preventDefault();
-    const formDataA = new FormData(trainingFormA);
-    const formDataB = new FormData(trainingFormB);
-    formDataA.delete("training_file");
-    for (var [key, value] of formDataA) {
-        formDataB.append(key, value);
+    const dropColCheckBoxes = document.getElementById("drop-checkboxes");
+    dropColumnCheckBoxGenerator(dropColCheckBoxes, result["columns"]);
+
+    const additionalAttributes = document.getElementById("additional-options");
+    if (result['additional_data'] != null) {
+        additionalAttributes.style.display = "block";
+        let formHTML = '';
+
+        result['additional_data'].forEach(function (val) {
+           formHTML += "<label for=\"" + val[1] + "\" class=\"form-label\">Select" + val[2] + "</label>\n";
+           if (val[0] === 'select') {
+               formHTML += "<select class=\"form-select\" id=\"" + val[1] + "\" name=\"" + val[1] + "\"></select>"
+           } else if (val[0] === 'text') {
+               formHTML += "<input type=\"text\" class=\"form-control\" name=\"" + val[1] + "\">"
+           }
+        });
+
+        additionalAttributes.innerHTML = formHTML;
+
+    } else {
+        additionalAttributes.style.display = "none";
     }
-    formDataB.append("file_path", filePath);
-    await fetch('http://127.0.0.1:5000/submit/training/2', {
-        method: 'POST',
-        body: formDataB
-    }).then(function (response) {
-        return response.text();
-    }).then(function (html) {
-        console.log(document.innerHTML)
-        document.querySelector('html').innerHTML = html;
-    });
 }
 
 function algoSelectionOptions(algoSelector, learning_method) {
     let optionHTML = '';
-    if (learning_method == 'supervised') {
+    if (learning_method === 'supervised') {
         let data = [
-            ["linear_regression", "Linear Regression"], 
-            ["logistic_regression", "Logistic Regression"], 
-            ["svm", "Support Vector Machine (SVM)"], 
-            ["random_forest", "Random Forest"]
+            ["linear_regression", "Linear Regression"],
         ]
         for(let opt of data) {
             optionHTML += '<option value ="'  + opt[0] + '">' + opt[1] + '</option>';
         }
         algoSelector.innerHTML = optionHTML;
-    } else if (learning_method == 'unsupervised') {
-        let data = [["knn", "K-Nearest Neighbours"], ["k-means", "K-Means"]];
+    } else if (learning_method === 'unsupervised') {
+        let data = [
+            ["hierarchical_clustering", "Hierarchical Clustering"],
+            ["pca", "Principal Component Analysis (PCA)"],
+            // ["knn", "K-Nearest Neighbours"],
+            // ["k-means", "K-Means"]
+        ];
         for(let opt of data) {
             optionHTML += '<option value ="'  + opt[0] + '">' + opt[1] + '</option>';
         }
@@ -77,17 +87,12 @@ $(document).ready(function () {
     const algorithm = document.getElementById('algorithm');
 
     algoSelectionOptions(algorithm, learningMethod.value);
-    learningMethod.addEventListener('change', (event) => {
+    learningMethod.addEventListener('change', (_) => {
         algoSelectionOptions(algorithm, learningMethod.value);
     });
 
     const training_form = document.getElementById("training_form_a");
     training_form.addEventListener('submit', async function (e) {
-        sumbitTrainingFormA(e, training_form);
-    });
-
-    const training_form_b = document.getElementById("training_form_b");
-    training_form_b.addEventListener('submit', async function (e) {
-        sumbitTrainingFormB(e, training_form, training_form_b);
+        await sumbitTrainingFormA(e, training_form);
     });
 });

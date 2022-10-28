@@ -1,76 +1,95 @@
-import io
+import re
 import json
 import pandas as pd
 
-from flask import Blueprint, Response, request, render_template
-from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
-from matplotlib.figure import Figure
-
-from app.utilities import save_file, supervised_algorithm
+from flask import Blueprint, request, render_template
+from app.utilities import save_file
+from app.machine_learning.data_model import DataModel
 
 main = Blueprint('main', __name__)
 
-file_path = None
-target = None
-model = None
-info = None
+dm: DataModel | None = None
 
-X_train = None
-X_test = None
-y_train = None
-X_test = None
-pred = None
 
 @main.route('/')
 def index():
     return render_template('index.html', render_args=None)
 
+
 @main.route('/submit/training/<step>', methods=['POST'])
-def handleTrainingRequests(step):
+def handle_training_request(step):
+    global dm
     step = int(step)
     if step == 1:
-        global file_path
         file_path = save_file(request)
         df = pd.read_csv(file_path)
-        df_cols = ["{}".format(col) for col in df.columns]
-        return json.dumps({
-            "columns" : df_cols,
-            "file_path" : file_path
-        })
-    elif step == 2:
-        algorithm = request.form['algorithm']
-        # file_path = request.form['file_path']
-        global target
-        target = request.form['target']
-        global model, info, X_train, X_test, y_train, y_test, pred
-        model, info, X_train, X_test, y_train, y_test, pred = supervised_algorithm(algorithm, target, file_path)
-        render_params = {
-            "info" : info,
-            "result" : None,
-            "experiment_vals" : None
+        learning_method = request.form["learning_method"]
+        algorithm = request.form["algorithm"]
+        dm = DataModel(df, learning_method, algorithm)
+
+        return_data = {
+            "columns": dm.column_names
         }
-        return render_template('results.html', render_args=render_params)
+
+        if learning_method == "unsupervised":
+            if algorithm == "hierarchical_clustering":
+                return_data['additional_data'] = [('text', 'n_clusters', ' number of clusters')]
+            elif algorithm == "pca":
+                return_data['additional_data'] = [('text', 'n_components', ' number of components')]
+
+        return json.dumps(return_data)
+    elif step == 2:
+        drop_cols = list()
+        target = request.form['target']
+        for k, v in request.form.items():
+            if re.match("^check_.*", k):
+                drop_cols.append(v)
+        exp = True
+        if dm and target:
+            if len(request.form) == 1:
+                dm.train_model(target, drop_cols)
+            else:
+                if dm.algorithm_name == "hierarchical_clustering":
+                    dm.train_model(target, drop_cols, n_clusters=int(request.form['n_clusters']))
+                    exp = False
+                elif dm.algorithm_name == "pca":
+                    dm.train_model(target, drop_cols, n_components=int(request.form['n_components']))
+                    exp = False
+            exp_cols = list(dm.column_names)
+            exp_cols.remove(dm.target)
+            render_params = {
+                "info": dm.model_info,
+                "exp_cols": exp_cols
+            }
+            if render_params["info"] is not None:
+                return render_template('results.html', render_args=render_params, experiment=exp)
+            else:
+                return render_template('error.html', error_message="Something went wrong")
+        else:
+            return render_template('error.html', error_message="Model not available")
     else:
-        return json.dumps("Exited")
+        return render_template('error.html', error_message="Invalid step")
+
 
 @main.route('/evaluate', methods=['POST'])
-def handleEvaluation():
-    data = [[int(request.form[val]) for val in request.form]]
-    global model
-    pred = model.predict(data)
-    render_params = {
-        "info" : info,
-        "result" : pred,
-        "experiment_vals" : data
-    }
-    return render_template('results.html', render_args=render_params)
+def evaluate():
+    data = [[float(request.form[val]) for val in request.form]]
+    print(data)
+    global dm
+    pred = dm.make_predictions(data)
+    exp_cols = list(dm.column_names)
+    exp_cols.remove(dm.target)
+    return json.dumps({
+        "experiment_vals": [val for val in zip(dm.column_names, data)],
+        "prediction": list(pred)
+    })
+
 
 @main.route('/image')
 def plot_image():
-    fig = Figure()
-    axis = fig.add_subplot(1, 1, 1)
-    axis.scatter(X_train, y_train)
-    axis.plot(X_test, pred, c='orange')
-    output = io.BytesIO()
-    FigureCanvas(fig).print_png(output)
-    return Response(output.getvalue(), mimetype='image/png')
+    global dm
+    if dm:
+        print("Generating plot")
+        return dm.make_image()
+    else:
+        return "<h3>Could not generate a plot. Insufficient data</h3>"

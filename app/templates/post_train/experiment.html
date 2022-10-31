@@ -1,0 +1,45 @@
+<div class="container mt-4">
+    <div style="text-align: center;">
+        <h2>Experiment Yourself</h2>
+    </div>
+
+    <form id="evaluation-form" method='POST' action="/evaluate">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Parameter</th>
+                    <th scope="col">Value</th>
+                </tr>
+            </thead>
+            {% if usuper is false %}
+                <tbody>
+                    {% for name in render_args['exp_cols'] %}
+                    <tr>
+                        <th scope="row">{{ name }}</th>
+                        <td>
+                            <div class="mb-3">
+                                <input type="text" class="form-control" name="{{ name }}">
+                            </div>
+                        </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            {% endif %}
+            {% if usuper is true %}
+                <tbody>
+                    <tr>
+                        <th scope="row">Clusters</th>
+                        <td>
+                            <div class="mb-3">
+                                <input type="text" class="form-control" name="clusters">
+                            </div>
+                        </td>
+                        </tr>
+                </tbody>
+            {% endif %}
+        </table>
+        <div id="results-section"></div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+
+</div>

@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 from matplotlib.axes import Axes
 
 from scipy.cluster.hierarchy import dendrogram, linkage
@@ -32,6 +33,13 @@ def hierarchical_clustering_plot(plot_model: PlotModel, x: np.ndarray):
     plot_model.set_parameters()
 
 
-def pca_plot(plot_model: PlotModel, x: np.ndarray, y: np.ndarray):
+def pca_plot(plot_model: PlotModel, x: np.ndarray, y: np.ndarray, transformed: np.ndarray, data: pd.DataFrame):
     plot_model.set_parameters()
-    plot_model.axis.scatter(x[:, 0], x[:, 1], c=y, cmap='plasma' )
+    for ii, jj in zip(transformed, data):
+        plot_model.axis.scatter(x[0] * ii[0], x[1] * ii[0], color='r')
+        plot_model.axis.scatter(y[0] * ii[1], y[1] * ii[1], color='c')
+        plot_model.axis.scatter(jj[0], jj[1], color='b')
+
+
+def kmeans_plot(plot_model: PlotModel, range_mod, wcss):
+    plot_model.axis.plot(range_mod, wcss)

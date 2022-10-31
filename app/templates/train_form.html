@@ -5,23 +5,20 @@
 
     <form id='training_form_a'>
         <div class="mb-3">
-            <label for="formFile" class="form-label">Upload training file (CSV format only)</label>
-            <input class="form-control" type="file" id="training_file" name="training_file" required="true">
+            <label for="training_file" class="form-label">Upload training file (CSV format only)</label>
+            <input class="form-control" type="file" id="training_file" name="training_file" required="required">
         </div>
-
         <div class="mb-3">
-            <label for="learning_method_selector" class="form-label">Select learning method</label>
-            <select class="form-select" aria-label="Default select example" id="learning_method" name="learning_method" required="true">
+            <label for="learning_method" class="form-label">Select learning method</label>
+            <select class="form-select" id="learning_method" name="learning_method" required="required">
                 <option selected value="supervised">Supervised</option>
                 <option value="unsupervised">Unsupervised</option>
             </select>
         </div>
-
         <div class="mb-3">
-            <label for="learning_method_selector" class="form-label">Select algorithm</label>
-            <select class="form-select" aria-label="Default select example" id="algorithm" name="algorithm"></select>
+            <label for="algorithm" class="form-label">Select algorithm</label>
+            <select class="form-select" id="algorithm" name="algorithm"></select>
         </div>
-        
         <button type="submit" class="btn btn-primary">Submit</button>
     </form>
 
@@ -29,16 +26,13 @@
         <form id='training_form_b' enctype="application/x-www-form-urlencoded" method="POST" action="/submit/training/2">
             <div class="mb-3">
                 <label for="target_col_field" class="form-label">Select target column</label>
-                <select class="form-select" id="target_col_field" name="target"></select>
+                <select class="form-select" id="target_col_field" name="target" required="required"></select>
             </div>
-
             <div class="mb-3">
                 <label for="drop_cols_checkboxes" class="form-label">Select columns to drop</label>
                 <div id="drop-checkboxes"></div>
             </div>
-
             <div class="mb-3" id="additional-options" style="display: none"></div>
-            
             <button type="submit" class="btn btn-primary my-3">Start training</button>
         </form>
     </div>

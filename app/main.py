@@ -45,9 +45,13 @@ def handle_training_request(step):
             if re.match("^check_.*", k):
                 drop_cols.append(v)
         exp = True
+        usuper = False
         if dm and target:
             if len(request.form) == 1:
                 dm.train_model(target, drop_cols)
+                if dm.algorithm_name == "kmeans":
+                    dm.train_model(target, drop_cols)
+                    usuper = True
             else:
                 if dm.algorithm_name == "hierarchical_clustering":
                     dm.train_model(target, drop_cols, n_clusters=int(request.form['n_clusters']))
@@ -62,7 +66,9 @@ def handle_training_request(step):
                 "exp_cols": exp_cols
             }
             if render_params["info"] is not None:
-                return render_template('results.html', render_args=render_params, experiment=exp)
+                return render_template(
+                    'post_train/results.html', render_args=render_params, experiment=exp, usuper=usuper
+                )
             else:
                 return render_template('error.html', error_message="Something went wrong")
         else:
@@ -73,6 +79,13 @@ def handle_training_request(step):
 
 @main.route('/evaluate', methods=['POST'])
 def evaluate():
+    if "clusters" in request.form.keys():
+        print("Here")
+        return json.dumps({
+            "experiment_vals": [val for val in zip(['Clusters'], [request.form['clusters']])],
+            "prediction": ["Graph plotted"],
+            "graph": True
+        })
     data = [[float(request.form[val]) for val in request.form]]
     print(data)
     global dm
@@ -91,5 +104,15 @@ def plot_image():
     if dm:
         print("Generating plot")
         return dm.make_image()
+    else:
+        return "<h3>Could not generate a plot. Insufficient data</h3>"
+
+
+@main.route('/evaluation/image')
+def evaluate_image():
+    global dm
+    if dm:
+        print("Generating plot")
+        return dm.evaluate_image(int(request.args.get("clusters")))
     else:
         return "<h3>Could not generate a plot. Insufficient data</h3>"

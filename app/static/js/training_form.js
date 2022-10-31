@@ -73,7 +73,7 @@ function algoSelectionOptions(algoSelector, learning_method) {
             ["hierarchical_clustering", "Hierarchical Clustering"],
             ["pca", "Principal Component Analysis (PCA)"],
             // ["knn", "K-Nearest Neighbours"],
-            // ["k-means", "K-Means"]
+            ["kmeans", "K-Means"]
         ];
         for(let opt of data) {
             optionHTML += '<option value ="'  + opt[0] + '">' + opt[1] + '</option>';

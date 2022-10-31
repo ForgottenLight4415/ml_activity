@@ -24,12 +24,22 @@ async function submitEvaluationForm(e, evaluation_form) {
             "</tr>\n";
     });
 
+    let prediction = null;
+    try {
+        prediction = result["prediction"][0].toFixed(4)
+    } catch (_) {
+        prediction = result["prediction"][0]
+    }
+
     expResultHTML += "</tbody>\n" +
     "</table>\n" +
     "</div>\n" +
-    "<div class=\"results\">\n<h4>" + "Result: " + result["prediction"][0].toFixed(4) + "</h4>\n" +
+    "<div class=\"results\">\n<h4>" + "Result: " + prediction + "</h4>\n" +
     "</div>";
 
+    if (result["graph"] === true) {
+        expResultHTML += "<img src=\"/evaluation/image?clusters=" + result["experiment_vals"][0][1] + "\" alt=\"train_info\">\n"
+    }
     const resultsSection = document.getElementById("results-section")
     resultsSection.innerHTML = expResultHTML
 }
